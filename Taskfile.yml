@@ -1,0 +1,40 @@
+# # Taskfile.yml # for mac
+# version: '3'
+
+# tasks:
+#   build:
+#     cmds: [go build -o bin/pulse ./cmd/pulse]
+#   run:
+#     cmds: [go run ./cmd/pulse]
+#   test:
+#     cmds: [go test ./... ./sandbox/...]
+#   lint:
+#     cmds: [golangci-lint run ./...]
+
+version: "3"
+
+vars:
+  VERSION:
+    sh: git describe --tags --always --dirty # тег или короткий хэш коммита
+
+tasks:
+  build:
+    desc: Собрать бинарник в bin/
+    cmds:
+      - go build -ldflags "-X main.version={{.VERSION}}" -o bin/pulse{{exeExt}} ./cmd/pulse
+
+  run:
+    desc: Запустить без сборки бинарника
+    cmds: [go run ./cmd/pulse]
+
+  test:
+    desc: Тесты основного модуля и песочницы
+    cmds: [go test ./... ./sandbox/...]
+
+  lint:
+    desc: Линтеры
+    cmds: [golangci-lint run ./...]
+
+  check:
+    desc: Всё перед коммитом
+    deps: [test, lint]
